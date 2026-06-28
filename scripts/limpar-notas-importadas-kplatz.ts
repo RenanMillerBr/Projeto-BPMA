@@ -37,7 +37,7 @@ const TARGET_NOTES: TargetNote[] = [
   },
   {
     notaFiscal: "45726",
-    fornecedor: "ROISSANTS DE FRANCE COMERCIO DE MASSAS LTDA"
+    fornecedor: "CROISSANTS DE FRANCE COMERCIO DE MASSAS LTDA"
   }
 ];
 
