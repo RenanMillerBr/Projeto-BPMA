@@ -52,7 +52,7 @@ const MODULE_PATH = "/controle-temperatura-equipamentos";
 const HISTORY_PATH = "/controle-temperatura-equipamentos/historico";
 const OPTIONS_PATH = "/controle-temperatura-equipamentos/opcoes";
 const DUPLICATE_MEASUREMENT_MESSAGE =
-  "Este equipamento já possui aferição registrada para esta data e turno. Para alterar as informações, edite o registro existente.";
+  "Este equipamento já possui registro para este dia/turno.";
 
 type FeedbackType = "success" | "error";
 
@@ -232,7 +232,7 @@ async function getRegistroPayload(formData: FormData, responsavelLogado: string)
     true
   );
   if (!equipamentoOption) {
-    throw new Error("Selecione uma opção válida no campo Equipamento.");
+    throw new Error("O equipamento selecionado não existe ou está inativo.");
   }
 
   if (!equipamentoOption.categoriaEquipamento) {

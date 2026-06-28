@@ -31,12 +31,12 @@ export function SearchableOptionField({
     const normalizedQuery = normalizeOption(inputValue);
 
     if (!normalizedQuery) {
-      return options.slice(0, 8);
+      return options;
     }
 
-    return options
-      .filter((option) => normalizeOption(option).startsWith(normalizedQuery))
-      .slice(0, 8);
+    return options.filter((option) =>
+      normalizeOption(option).startsWith(normalizedQuery)
+    );
   }, [inputValue, options]);
 
   const hasExactMatch = useMemo(() => {
@@ -112,7 +112,7 @@ export function SearchableOptionField({
       >
         {showValidationHint
           ? "Selecione uma opção existente da lista."
-          : "Digite para buscar e selecione uma opção existente."}
+          : "Abra a lista para visualizar todas as opções ou digite para filtrar."}
       </span>
     </div>
   );

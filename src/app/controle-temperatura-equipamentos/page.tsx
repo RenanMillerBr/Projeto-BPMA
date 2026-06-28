@@ -33,6 +33,7 @@ import {
 } from "./actions";
 import { AutomaticCorrectiveActionFields } from "./automatic-corrective-action-fields";
 import { EvidencePhoto } from "./evidence-photo";
+import { normalizeOption } from "./options";
 import { TemperatureStatusBadge } from "./temperature-status-badge";
 import {
   formatDateInput,
@@ -108,6 +109,23 @@ function isOperationalRecord(registro: {
   statusOperacionalEquipamento: StatusOperacionalEquipamento;
 }): boolean {
   return isOperationalTemperatureStatus(registro.statusOperacionalEquipamento);
+}
+
+function getConfiguredTemperatureShifts(equipment: {
+  turnoManha: boolean;
+  turnoTarde: boolean;
+}): TurnoTemperaturaEquipamento[] {
+  return [
+    ...(equipment.turnoManha ? [TurnoTemperaturaEquipamento.MANHA] : []),
+    ...(equipment.turnoTarde ? [TurnoTemperaturaEquipamento.TARDE] : [])
+  ];
+}
+
+function getEquipmentShiftKey(
+  equipamento: string,
+  turno: TurnoTemperaturaEquipamento
+): string {
+  return `${normalizeOption(equipamento)}:${turno}`;
 }
 
 export default async function ControleTemperaturaEquipamentosPage({
@@ -216,10 +234,7 @@ export default async function ControleTemperaturaEquipamentosPage({
     .filter((option) => option.tipo === TipoOpcaoTemperaturaEquipamento.EQUIPAMENTO)
     .map((option) => ({
       nome: option.nome,
-      turnos: [
-        ...(option.turnoManha ? [TurnoTemperaturaEquipamento.MANHA] : []),
-        ...(option.turnoTarde ? [TurnoTemperaturaEquipamento.TARDE] : [])
-      ]
+      turnos: getConfiguredTemperatureShifts(option)
     }));
   const regrasCategoriaForm = categoryRules.map((regra) => ({
     categoria: regra.categoria.categoria,
@@ -251,10 +266,6 @@ export default async function ControleTemperaturaEquipamentosPage({
       })
     : null;
 
-  const equipamentoFormOptions =
-    registroEmEdicao && !equipamentoOptionsAtivas.includes(registroEmEdicao.equipamento)
-      ? [registroEmEdicao.equipamento, ...equipamentoOptionsAtivas]
-      : equipamentoOptionsAtivas;
   const fechamentoMesRaw = parsePositiveInt(firstParam(params.fechamentoMes));
   const fechamentoAnoRaw = parsePositiveInt(firstParam(params.fechamentoAno));
   const periodoAtual = getMonthYear(now);
@@ -354,6 +365,39 @@ export default async function ControleTemperaturaEquipamentosPage({
         orderBy: [{ createdAt: "desc" }]
       })
     : [];
+  const turnosRegistradosPorEquipamento = new Set(
+    registrosDuplicidadeFormulario.map((registro) =>
+      getEquipmentShiftKey(registro.equipamento, registro.turno)
+    )
+  );
+  const equipamentosPendentes = equipamentoCatalogOptionsAtivas
+    .map((option) => {
+      const turnosPendentes = getConfiguredTemperatureShifts(option).filter(
+        (turno) =>
+          !turnosRegistradosPorEquipamento.has(
+            getEquipmentShiftKey(option.nome, turno)
+          )
+      );
+
+      return { option, turnosPendentes };
+    })
+    .filter(({ turnosPendentes }) => turnosPendentes.length > 0);
+  const equipamentoOptionsPendentes = equipamentosPendentes.map(
+    ({ option }) => option.nome
+  );
+  const equipamentoFormOptions = registroEmEdicao
+    ? !equipamentoOptionsAtivas.includes(registroEmEdicao.equipamento)
+      ? [registroEmEdicao.equipamento, ...equipamentoOptionsAtivas]
+      : equipamentoOptionsAtivas
+    : equipamentoOptionsPendentes;
+  const equipamentosTurnosFormulario = registroEmEdicao
+    ? equipamentosTurnos
+    : equipamentosPendentes.map(({ option, turnosPendentes }) => ({
+        nome: option.nome,
+        turnos: turnosPendentes
+      }));
+  const semEquipamentosDisponiveis =
+    !registroEmEdicao && equipamentoFormOptions.length === 0;
   const registrosDuplicidadeForm = registrosDuplicidadeFormulario.map((registro) => {
     const query = new URLSearchParams(parametrosRetorno);
     query.set("editId", String(registro.id));
@@ -452,6 +496,10 @@ export default async function ControleTemperaturaEquipamentosPage({
                 " Solicite à gestão a configuração inicial do módulo."
               )}
             </p>
+          ) : semEquipamentosDisponiveis ? (
+            <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200">
+              Todos os equipamentos previstos para este período já foram registrados.
+            </p>
           ) : registroEmEdicao && registroEmEdicaoBloqueado ? (
             <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200">
               Este registro pertence a um mês fechado e não pode ser alterado.
@@ -478,7 +526,7 @@ export default async function ControleTemperaturaEquipamentosPage({
             <AutomaticCorrectiveActionFields
               equipamentoOptions={equipamentoFormOptions}
               equipamentosCategoria={equipamentosCategoria}
-              equipamentosTurnos={equipamentosTurnos}
+              equipamentosTurnos={equipamentosTurnosFormulario}
               regrasCategoria={regrasCategoriaForm}
               registrosDuplicidade={registrosDuplicidadeForm}
               defaultEquipamento={registroEmEdicao?.equipamento ?? ""}

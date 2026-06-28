@@ -225,7 +225,7 @@ export function AutomaticCorrectiveActionFields({
       }
 
       input.setCustomValidity(
-        "Este equipamento já possui aferição registrada para esta data e turno. Para alterar as informações, edite o registro existente."
+        "Este equipamento já possui registro para este dia/turno."
       );
       event.preventDefault();
       event.stopPropagation();
