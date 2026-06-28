@@ -19,6 +19,7 @@
     "reset:kplatz-inicio": "node --no-warnings --experimental-strip-types prisma/reset-kplatz-inicio-operacao.ts",
     "reset:historicos-operacionais": "node --no-warnings --experimental-strip-types prisma/reset-historicos-operacionais.ts",
     "reset:historico-plano-diario": "node --no-warnings --experimental-strip-types prisma/reset-historico-plano-diario.ts",
+    "limpar:notas:kplatz": "node --no-warnings --experimental-strip-types scripts/limpar-notas-importadas-kplatz.ts",
     "fotos:temperatura:dry-run": "node --no-warnings --experimental-strip-types scripts/migrar-fotos-temperatura-base64.ts migrar --dry-run",
     "fotos:temperatura:migrar": "node --no-warnings --experimental-strip-types scripts/migrar-fotos-temperatura-base64.ts migrar",
     "fotos:temperatura:reparar-arquivos-dry-run": "node --no-warnings --experimental-strip-types scripts/migrar-fotos-temperatura-base64.ts reparar --dry-run",
