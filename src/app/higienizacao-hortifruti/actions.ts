@@ -27,7 +27,7 @@ import {
   getDurationInMinutes,
   getMonthDateRange,
   getMonthYear,
-  getTodaySystemDate,
+  parseDateInput,
   parsePositiveInt
 } from "./utils";
 
@@ -147,7 +147,14 @@ export async function createRegistroAction(formData: FormData) {
   try {
     const actor = await getCurrentUserForAction();
 
-    const data = getTodaySystemDate();
+    const dataInput = getInputValue(formData, "data");
+    const data = /^\d{4}-\d{2}-\d{2}$/.test(dataInput)
+      ? parseDateInput(dataInput)
+      : null;
+    if (!data) {
+      throw new Error("Informe uma data válida para o registro.");
+    }
+
     const payload = await getRegistroPayload(formData, actor.nomeCompleto);
     const { mes, ano } = getMonthYear(data);
 

@@ -25,8 +25,6 @@ import { SearchableOptionField } from "./searchable-option-field";
 import {
   formatDateDisplay,
   formatDateInput,
-  formatDateTimeDisplay,
-  getCurrentSystemDateTime,
   getMonthDateRange,
   getMonthYear,
   getTodaySystemDate,
@@ -141,8 +139,6 @@ export default async function HigienizacaoHortifrutiPage({
   const registroParaExcluir = deleteId
     ? await prisma.higienizacaoHortifruti.findUnique({ where: { id: deleteId } })
     : null;
-
-  const now = getCurrentSystemDateTime();
 
   const periodos = new Map<string, { mes: number; ano: number }>();
   for (const registro of registros) {
@@ -296,12 +292,25 @@ export default async function HigienizacaoHortifrutiPage({
               <input type="hidden" name="returnTo" value={formReturnTo} />
               {registroEmEdicao ? <input type="hidden" name="id" value={registroEmEdicao.id} /> : null}
 
-            <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 md:col-span-2 dark:border-slate-700 dark:bg-slate-800">
-              <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Data do Procedimento</p>
-              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-                {registroEmEdicao ? formatDateDisplay(registroEmEdicao.data) : formatDateTimeDisplay(now)} (Automática)
-              </p>
-            </div>
+            {registroEmEdicao ? (
+              <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 md:col-span-2 dark:border-slate-700 dark:bg-slate-800">
+                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Data do Procedimento</p>
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                  {formatDateDisplay(registroEmEdicao.data)}
+                </p>
+              </div>
+            ) : (
+              <label className="text-sm text-slate-700 md:col-span-2 dark:text-slate-200">
+                Data do Procedimento *
+                <input
+                  type="date"
+                  name="data"
+                  required
+                  defaultValue={todayInput}
+                  className={INPUT_CLASS}
+                />
+              </label>
+            )}
 
             <label className="text-sm text-slate-700 dark:text-slate-200">
               Hortifruti *
