@@ -430,7 +430,7 @@ async function generateTemperaturaReport(moduleId: ReportModuleId, reportId: str
         mimeType: item.fotoMimeType,
         base64: item.fotoBase64
       });
-      return { data: formatDateDisplay(item.data), equipamento: item.equipamento, turno: labelTurnoTemperatura(item.turno), statusOperacional: labelStatusOperacionalTemperatura(item.statusOperacionalEquipamento), temperatura: operacional ? formatTemperature(item.temperaturaAferida) : "Não aplicável", status: operacional ? labelStatusTemperatura(item.status) : "Não aplicável", acaoCorretiva: operacional ? valueOrDash(item.acaoCorretiva) : "-", foto: operacional && temFoto ? "Foto anexada" : "-", responsavel: item.responsavel, dataHoraRegistro: formatDateTimeDisplay(item.createdAt) };
+      return { data: formatDateDisplay(item.data), equipamento: item.equipamento, turno: labelTurnoTemperatura(item.turno), statusOperacional: labelStatusOperacionalTemperatura(item.statusOperacionalEquipamento), temperatura: operacional ? formatTemperature(item.temperaturaAferida) : "Não aplicável", status: operacional ? labelStatusTemperatura(item.status) : "Não aplicável", acaoCorretiva: operacional ? valueOrDash(item.acaoCorretiva) : item.statusOperacionalEquipamento === StatusOperacionalEquipamento.MANUTENCAO ? "Em manutenção" : "-", foto: operacional && temFoto ? "Foto anexada" : "-", responsavel: item.responsavel, dataHoraRegistro: formatDateTimeDisplay(item.createdAt) };
     })
   });
 }

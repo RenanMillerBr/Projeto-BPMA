@@ -254,7 +254,11 @@ function buildEquipmentReports(params: {
           record.statusOperacionalEquipamento === StatusOperacionalEquipamento.EM_OPERACAO;
         cellsByDayShift.set(getCellKey(turno, day), {
           temperature: inOperation ? formatTemperature(record.temperaturaAferida) : "",
-          correctiveAction: inOperation ? valueOrEmpty(record.acaoCorretiva) : "",
+          correctiveAction: inOperation
+            ? valueOrEmpty(record.acaoCorretiva)
+            : record.statusOperacionalEquipamento === StatusOperacionalEquipamento.MANUTENCAO
+              ? "Em manutenção"
+              : "",
           responsible: valueOrEmpty(record.responsavel),
           supervisor: valueOrDash(params.supervisorByDate.get(getRecordDateKey(record)))
         });
