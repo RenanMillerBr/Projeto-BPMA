@@ -462,8 +462,8 @@ async function generateOleoReport(moduleId: ReportModuleId, reportId: string, pa
       { label: "Temperatura crítica", value: filtered.filter((item) => item.temperaturaCritica).length },
       { label: "Exigem acompanhamento", value: filtered.filter((item) => item.status !== StatusQualidadeOleo.ADEQUADO && item.status !== StatusQualidadeOleo.SEM_UTILIZACAO).length }
     ],
-    columns: columns([["data", "Data"], ["equipamento", "Equipamento"], ["fita", "Fita"], ["temperatura", "Temperatura"], ["status", "Status"], ["observacao", "Observação"], ["responsavel", "Responsável"]]),
-    rows: filtered.map((item) => ({ data: formatDateDisplay(item.data), equipamento: item.semUtilizacao ? "Inutilizado / sem uso" : "Não informado no cadastro atual", fita: valueOrDash(item.fitaOleo), temperatura: formatTemperature(item.temperatura), status: labelStatusOleo(item.status), observacao: valueOrDash(item.observacao), responsavel: item.responsavel })),
+    columns: columns([["data", "Data"], ["equipamento", "Equipamento"], ["fita", "Fita"], ["temperatura", "Temperatura"], ["status", "Status"], ["observacao", "Observação / ação"], ["responsavel", "Responsável"]]),
+    rows: filtered.map((item) => ({ data: formatDateDisplay(item.data), equipamento: item.semUtilizacao ? "Inutilizado / sem uso" : "Não informado no cadastro atual", fita: valueOrDash(item.fitaOleo), temperatura: formatTemperature(item.temperatura), status: labelStatusOleo(item.status), observacao: valueOrDash(item.observacao?.trim() || item.orientacao), responsavel: item.responsavel })),
     notes: ["O modelo atual do Controle de Qualidade do Óleo não possui campo de equipamento individual; o relatório indica uso/sem uso quando disponível."]
   });
 }

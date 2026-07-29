@@ -382,7 +382,7 @@ function renderRecordsTable(report: MonthlyOilReport): string {
           <th>Temperatura (T°C)</th>
           <th>Responsável</th>
           <th>Supervisor</th>
-          <th>Observação</th>
+          <th>Observação / ação</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
@@ -460,6 +460,7 @@ export async function GET(request: NextRequest) {
         fitaOleo: true,
         temperatura: true,
         responsavel: true,
+        orientacao: true,
         observacao: true
       },
       orderBy: [{ data: "asc" }, { createdAt: "asc" }, { id: "asc" }]
@@ -523,7 +524,7 @@ export async function GET(request: NextRequest) {
         temperatura: formatTemperature(record.temperatura),
         responsavel: valueOrDash(record.responsavel),
         supervisor: valueOrDash(dailySignature?.usuarioNomeSnapshot),
-        observacao: valueOrDash(record.observacao)
+        observacao: valueOrDash(record.observacao?.trim() || record.orientacao)
       };
     }),
     closureResponsible,
